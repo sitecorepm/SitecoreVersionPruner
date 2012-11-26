@@ -1,0 +1,102 @@
+<project>
+  <Metadata>
+    <metadata>
+      <PackageName>Version Pruner Module</PackageName>
+      <Author>Paul Martin</Author>
+      <Version>1.0</Version>
+      <Revision />
+      <License />
+      <Comment />
+      <Attributes />
+      <Readme />
+      <Publisher />
+      <PostStep />
+      <PackageID />
+    </metadata>
+  </Metadata>
+  <SaveProject>True</SaveProject>
+  <Sources>
+    <xitems>
+      <Entries>
+        <x-item>/master/sitecore/templates/Version Pruner Module/{60C01C8A-7F73-498D-9E62-64C4AC8B5F5A}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/__Standard Values/{808D7ECF-6382-48BA-982D-7EDB7D45FF5C}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/{BDC6444C-2A68-4BC8-8FF1-F66737C47F5D}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/Version Pruner/{E9581C48-A7EB-4C91-B78C-2A6C827F2BD9}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/Version Pruner/Database/{86F8D6E1-A874-4E66-8E66-953B2273F3F6}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/Version Pruner/Disable Indexing While Processing/{6FA775F4-5F7E-4E48-B1C9-05B77C911169}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/Version Pruner/Item Filter/{E21357BC-E0C8-476E-B312-F81EF805A111}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/Version Pruner/Root/{FC33F0FE-A701-4827-B6C4-D252498FBCC2}/invariant/0</x-item>
+        <x-item>/master/sitecore/templates/Version Pruner Module/Version Pruner Command/Version Pruner/Version Filter/{25180620-D8E6-4174-80D7-5777279B5DB8}/invariant/0</x-item>
+      </Entries>
+      <SkipVersions>False</SkipVersions>
+      <Converter>
+        <ItemToEntryConverter>
+          <Transforms />
+        </ItemToEntryConverter>
+      </Converter>
+      <Include />
+      <Exclude />
+      <Name>templates</Name>
+    </xitems>
+    <xitems>
+      <Entries>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/{C3676F11-F293-490A-A79C-8E4765F8D26A}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Actions/{EB9E645D-BCCC-4667-B534-8AED53947A0E}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Actions/Archive Removed Versions/{50504A15-45F9-4ADA-958B-8B53CF4664BB}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Actions/Process Item/{7810742A-6B16-4761-A5ED-D18A10F17340}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Actions/Remove Version/{182E0BF2-1EE0-4289-A162-5D483A033340}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Actions/Serialize Removed Versions/{554031BE-4015-4D68-A9D9-2EB497400A1A}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Conditions/{E427F2D1-1774-46C0-9B40-059FE6A875BF}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Conditions/Version Modified Within/{4FD7D62F-D06E-4909-854F-2F542EE3AFFF}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Settings/Rules/Version Pruner Module/Conditions/Version Number/{797ACB2D-0293-4F7C-9544-7B410C1DF5AC}/invariant/0</x-item>
+      </Entries>
+      <SkipVersions>False</SkipVersions>
+      <Converter>
+        <ItemToEntryConverter>
+          <Transforms />
+        </ItemToEntryConverter>
+      </Converter>
+      <Include />
+      <Exclude />
+      <Name>rules</Name>
+    </xitems>
+    <xitems>
+      <Entries>
+        <x-item>/master/sitecore/system/Tasks/Commands/Run Version Pruner/{062A4A7E-8E6C-49E9-8B15-8DC07761D341}/invariant/0</x-item>
+        <x-item>/master/sitecore/system/Tasks/Schedules/Version Pruner Schedule/{79A706E2-8C36-4112-BB99-C909A55D21E6}/invariant/0</x-item>
+      </Entries>
+      <SkipVersions>False</SkipVersions>
+      <Converter>
+        <ItemToEntryConverter>
+          <Transforms />
+        </ItemToEntryConverter>
+      </Converter>
+      <Include />
+      <Exclude />
+      <Name>tasks</Name>
+    </xitems>
+    <xfiles>
+      <Entries>
+        <x-item>/bin/Sitecore.SharedSource.VersionPruner.dll</x-item>
+        <x-item>/bin/Sitecore.SharedSource.VersionPruner.pdb</x-item>
+      </Entries>
+      <Converter>
+        <FileToEntryConverter>
+          <Root>/</Root>
+          <Transforms />
+        </FileToEntryConverter>
+      </Converter>
+      <Include />
+      <Exclude />
+      <Name>DLLs</Name>
+    </xfiles>
+  </Sources>
+  <Converter>
+    <TrivialConverter>
+      <Transforms />
+    </TrivialConverter>
+  </Converter>
+  <Include />
+  <Exclude />
+  <Name />
+</project>
