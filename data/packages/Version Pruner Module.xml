@@ -3,10 +3,11 @@
     <metadata>
       <PackageName>Version Pruner Module</PackageName>
       <Author>Paul Martin</Author>
-      <Version>1.0</Version>
+      <Version>1.1</Version>
       <Revision />
       <License />
-      <Comment />
+      <Comment>1.1 - small bug fixes
+1.0 - initial release</Comment>
       <Attributes />
       <Readme />
       <Publisher />

@@ -121,19 +121,19 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
             {
                 // Get the root
                 var root = this.RootItem;
-                if (root != null)
+                Assert.ArgumentNotNull(root, "RootItem");
+
+                if (disableIndexing)
                 {
-                    if (disableIndexing)
-                    {
-                        Log.Info("Temporarily disable indexing...", this);
-                        Sitecore.Configuration.Settings.Indexing.Enabled = false;
-                    }
-                    ProcessItemTree(root);
+                    Log.Info("Temporarily disable indexing...", this);
+                    Sitecore.Configuration.Settings.Indexing.Enabled = false;
                 }
+                ProcessItemTree(root);
             }
             catch (Exception ex)
             {
                 Log.Error("VersionPruner exception", ex, this);
+                throw;
             }
             finally
             {
@@ -148,6 +148,12 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
 
         protected virtual void ProcessItemTree(Item item)
         {
+            if (Sitecore.Context.Job != null)
+            {
+                Sitecore.Context.Job.Status.Processed++;
+                Sitecore.Context.Job.Status.Messages.Add("processing: " + item.Paths.Path);
+            }
+
             // Run item against the Item Filter rule(s)
             var ruleContext = new RuleContext();
             ruleContext.Item = item;
