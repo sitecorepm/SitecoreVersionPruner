@@ -188,7 +188,11 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
 
             // set the latest valid version for this item
             var latestValidVersion = item.Publishing.GetValidVersion(DateTime.Now, true, false);
-            Assert.ArgumentNotNull(latestValidVersion, "latestValidVersion");
+            if (latestValidVersion == null)
+            {
+                Log.Warn(string.Format("Item does not have a published version. This item will NOT be pruned. [{0}]", item.Paths.Path), this);
+                return;
+            }
 
             // Get an array of all possible versions that can be removed
             var versions = item.Versions.GetVersions()
@@ -211,27 +215,29 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                 }
             }
 
-
-            if (SerializeItemsEnabled)
+            if (deleteMe.Count > 0)
             {
-                // Serialize versions..
-                this.Serializer.SerializeItemVersions(item, deleteMe.Select(x => x.Version.Number).ToArray());
-            }
+                if (SerializeItemsEnabled)
+                {
+                    // Serialize versions..
+                    this.Serializer.SerializeItemVersions(item, deleteMe.Select(x => x.Version.Number).ToArray());
+                }
 
-            if (ArchiveVersionsEnabled)
-            {
-                // Copy the to-be-deleted item versions to the Archive database..
-                this.Archiver.ArchiveItemVersions(deleteMe.ToArray());
-            }
+                if (ArchiveVersionsEnabled)
+                {
+                    // Copy the to-be-deleted item versions to the Archive database..
+                    this.Archiver.ArchiveItemVersions(deleteMe.ToArray());
+                }
 
-            foreach (var v in deleteMe)
-            {
-                var msg = String.Format("Remove version. [{0}][{1}][vers# {2}]",
-                                  item.Language.Name,
-                                  item.Paths.FullPath,
-                                  v.Version.Number);
-                Log.Audit(msg, this);
-                v.Versions.RemoveVersion();
+                foreach (var v in deleteMe)
+                {
+                    var msg = String.Format("Remove version. [{0}][{1}][vers# {2}]",
+                                      item.Language.Name,
+                                      item.Paths.FullPath,
+                                      v.Version.Number);
+                    Log.Audit(msg, this);
+                    v.Versions.RemoveVersion();
+                }
             }
         }
     }
