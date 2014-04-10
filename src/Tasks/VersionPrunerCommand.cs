@@ -19,10 +19,6 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
 
         protected CommandItem CommandItem { get; set; }
         protected bool DisableIndexing { get { return this.CommandItem["Disable Indexing While Processing"] == "1"; } }
-        protected bool SerializeItemsEnabled { get; set; }
-        protected bool ArchiveVersionsEnabled { get; set; }
-        protected string SerializeRootFolder { get; set; }
-        protected string ArchiveName { get; set; }
 
         private Database _Database = null;
         protected Database Database
@@ -82,7 +78,7 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                 if (_Serializer == null)
                     _Serializer = new VersionSerializer()
                     {
-                        SerializationFolder = this.SerializeRootFolder
+                        SerializationFolder = this.CommandItem["Serialization Root Folder"]
                     };
                 return _Serializer;
             }
@@ -95,8 +91,7 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                 if (_Archiver == null)
                     _Archiver = new VersionArchiver()
                     {
-                        DatabaseName = this.Database.Name,
-                        ArchiveName = this.ArchiveName
+                        Database = this.Database
                     };
                 return _Archiver;
             }
@@ -128,6 +123,8 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                     Log.Info("Temporarily disable indexing...", this);
                     Sitecore.Configuration.Settings.Indexing.Enabled = false;
                 }
+
+                Log.Info(string.Format("Start prune search from root item: {0}", root.Paths.Path), this);
                 ProcessItemTree(root);
             }
             catch (Exception ex)
@@ -161,18 +158,6 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
 
             if (ruleContext.Parameters.ContainsKey("ItemValidForVersionRemoval"))
             {
-                if (ruleContext.Parameters.ContainsKey("ArchiveRemovedVersions"))
-                {
-                    this.ArchiveVersionsEnabled = true;
-                    this.ArchiveName = ruleContext.Parameters["ArchiveName"] as string;
-                }
-
-                if (ruleContext.Parameters.ContainsKey("SerializeRemovedVersions"))
-                {
-                    this.SerializeItemsEnabled = true;
-                    this.SerializeRootFolder = ruleContext.Parameters["SerializeRootFolder"] as string;
-                }
-
                 // Rule was passed, so this item's versions should be trimmed..
                 TrimItemVersions(item);
             }
@@ -184,9 +169,9 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
 
         protected virtual void TrimItemVersions(Item item)
         {
-            var deleteMe = new List<Item>();
+            var pruneMe = new List<PruneAction>();
 
-            // set the latest valid version for this item
+            // Get the latest valid version for this item
             var latestValidVersion = item.Publishing.GetValidVersion(DateTime.Now, true, false);
             if (latestValidVersion == null)
             {
@@ -200,6 +185,9 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                                     .OrderBy(x => x.Version.Number)
                                     .ToArray();
 
+            Log.Debug(string.Format("[{0}][latest published version #: {1}][# of pruning candidates: {2}]", item.Paths.Path, latestValidVersion, versions.Length), this);
+
+            
             // Process each item version against the Version Filter rules
             foreach (var v in versions)
             {
@@ -208,37 +196,57 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                 ruleContext.Item = v;
                 this.VersionFilterRules.Run(ruleContext);
 
-                if (ruleContext.Parameters.ContainsKey("MarkVersionForRemoval"))
+
+                var a = new PruneAction
+                {
+                    ItemVersion = v
+                };
+
+                a.Archive = ruleContext.Parameters.ContainsKey("ArchiveThisVersion");
+                a.Serialize = ruleContext.Parameters.ContainsKey("SerializeThisVersion");
+
+                if (a.Archive || a.Serialize)
                 {
                     // Passed all rules. Add to "deleteMe" list
-                    deleteMe.Add(v);
+                    pruneMe.Add(a);
                 }
             }
 
-            if (deleteMe.Count > 0)
+            if (pruneMe.Count > 0)
             {
-                if (SerializeItemsEnabled)
+                if (pruneMe.Any(x => x.Serialize))
                 {
                     // Serialize versions..
-                    this.Serializer.SerializeItemVersions(item, deleteMe.Select(x => x.Version.Number).ToArray());
+                    var serializeMe = pruneMe.Where(x => x.Serialize);
+                    this.Serializer.SerializeItemVersions(item, serializeMe.Select(x => x.ItemVersion.Version.Number).ToArray());
                 }
 
-                if (ArchiveVersionsEnabled)
+                if (pruneMe.Any(x => x.Archive))
                 {
                     // Copy the to-be-deleted item versions to the Archive database..
-                    this.Archiver.ArchiveItemVersions(deleteMe.ToArray());
+                    this.Archiver.ArchiveItemVersions(pruneMe.Where(x => x.Archive).Select(x => x.ItemVersion).ToArray());
                 }
 
-                foreach (var v in deleteMe)
+                if (pruneMe.Any(x => !x.Archive))
                 {
-                    var msg = String.Format("Remove version. [{0}][{1}][vers# {2}]",
-                                      item.Language.Name,
-                                      item.Paths.FullPath,
-                                      v.Version.Number);
-                    Log.Audit(msg, this);
-                    v.Versions.RemoveVersion();
+                    foreach (var v in pruneMe.Where(x => !x.Archive))
+                    {
+                        var msg = String.Format("Delete version: [{0}][{1}][vers# {2}]",
+                                          item.Language.Name,
+                                          item.Paths.FullPath,
+                                          v.ItemVersion.Version.Number);
+                        Log.Audit(msg, this);
+                        v.ItemVersion.Versions.RemoveVersion();
+                    }
                 }
             }
         }
+    }
+
+    class PruneAction
+    {
+        public Item ItemVersion { get; set; }
+        public bool Archive { get; set; }
+        public bool Serialize { get; set; }
     }
 }
