@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using Sitecore.Configuration;
 using Sitecore.Diagnostics;
@@ -36,15 +37,47 @@ namespace Sitecore.SharedSource.VersionPruner.Helpers
             Assert.ArgumentNotNull(item, "item");
             var now = DateTime.Now;
 
-            var path = new StringBuilder(this.SerializationFolder + "/");
-            path.Append(now.Year + "/");
-            path.Append(now.Month + "/");
-            path.Append(now.Day + "/");
-            path.Append(item.Name + "_" + item.ID.Guid.ToString() + "/");
-            path.Append("Versions_" + VersionArrayToString(versions.OrderBy(x => x).ToArray()));
+            //var path = new StringBuilder(this.SerializationFolder + "/");
+            var itemPath = new StringBuilder();
+            itemPath.Append(now.Year + "/");
+            itemPath.Append(now.Month + "/");
+            itemPath.Append(now.Day + "/");
+            itemPath.Append(item.Name + "_" + item.ID.Guid.ToString() + "/");
+            itemPath.Append("Versions_" + VersionArrayToString(versions.OrderBy(x => x).ToArray()));
+
+            var path = new StringBuilder(string.Concat(this.SerializationFolder, "/", itemPath));
 
             Log.Info(string.Format("Serializing {0} --> {1}", item.Paths.Path, path.ToString()), this);
-            Manager.DumpItem(PathUtils.GetFilePath(path.ToString()), item);
+
+            //added support for Apsolute Paths.
+            var serializationPath = string.Empty;
+            if (Path.IsPathRooted(path.ToString()))
+            {
+                if (!Directory.Exists(this.SerializationFolder))
+                {
+                    Directory.CreateDirectory(this.SerializationFolder);
+                }
+
+                var localPath = path.ToString();
+                var localDirPath = Path.GetDirectoryName(localPath);
+
+                if (string.IsNullOrEmpty(localDirPath))
+                {
+                    throw new Exception("VersionPruner.VersionSerializer.SerializeItemVersion: couldn't extract directory from file path. filePath: " + localPath);
+                }
+
+                if (!Directory.Exists(localDirPath))
+                {
+                    Directory.CreateDirectory(localDirPath);
+                }
+                serializationPath = localPath;
+            }
+            else
+            {
+                serializationPath = PathUtils.GetFilePath(path.ToString());
+            }
+
+            Manager.DumpItem(serializationPath, item);
         }
 
         /// <summary>
