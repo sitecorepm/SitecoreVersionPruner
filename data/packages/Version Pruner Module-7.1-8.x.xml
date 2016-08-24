@@ -3,10 +3,10 @@
     <metadata>
       <PackageName>Version Pruner Module</PackageName>
       <Author>Paul Martin</Author>
-      <Version>7.1.0</Version>
+      <Version>7.1-8.x</Version>
       <Revision />
       <License />
-      <Comment>7.1.0 - new rules configuration; new package versioning to match minumum supported Sitecore version
+      <Comment>7.1-8.x - new rules configuration; new package versioning to match minumum supported Sitecore version
 
 1.2 - bug fix - issue #1 from GitHub
 1.1 - small bug fixes
