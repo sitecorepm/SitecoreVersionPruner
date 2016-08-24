@@ -151,15 +151,19 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                 Sitecore.Context.Job.Status.Messages.Add("processing: " + item.Paths.Path);
             }
 
-            // Run item against the Item Filter rule(s)
-            var ruleContext = new RuleContext();
-            ruleContext.Item = item;
-            this.ItemFilterRules.Run(ruleContext);
-
-            if (ruleContext.Parameters.ContainsKey("ItemValidForVersionRemoval"))
+            // Run item against the Item Filter rule(s) for each language
+            foreach (var lang in item.Languages)
             {
-                // Rule was passed, so this item's versions should be trimmed..
-                TrimItemVersions(item);
+                var itemLanguage = item.Database.GetItem(item.ID, lang);
+                var ruleContext = new RuleContext();
+                ruleContext.Item = itemLanguage;
+                this.ItemFilterRules.Run(ruleContext);
+
+                if (ruleContext.Parameters.ContainsKey("ItemValidForVersionRemoval"))
+                {
+                    // Rule was passed, so this item's versions should be trimmed..
+                    TrimItemVersions(itemLanguage);
+                }
             }
 
             // process all descendant items..
