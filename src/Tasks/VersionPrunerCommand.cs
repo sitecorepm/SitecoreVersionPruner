@@ -185,9 +185,9 @@ namespace Sitecore.SharedSource.VersionPruner.Tasks
                                     .OrderBy(x => x.Version.Number)
                                     .ToArray();
 
-            Log.Debug(string.Format("[{0}][latest published version #: {1}][# of pruning candidates: {2}]", item.Paths.Path, latestValidVersion, versions.Length), this);
+            Log.Debug(string.Format("[{0}][latest published version #: {1}][# of pruning candidates: {2}]", item.Paths.Path, latestValidVersion.Version.Number, versions.Length), this);
 
-            
+
             // Process each item version against the Version Filter rules
             foreach (var v in versions)
             {
